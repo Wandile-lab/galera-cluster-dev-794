@@ -1,0 +1,68 @@
+services:
+  galera-node1:
+    image: mariadb:11.4
+    container_name: galera-node1
+    command: >
+      --wsrep-on=ON
+      --wsrep-cluster-name=glynac_cluster
+      --wsrep-cluster-address=gcomm://
+      --wsrep-node-name=galera-node1
+      --wsrep-node-address=galera-node1
+      --wsrep-provider=/usr/lib/galera/libgalera_smm.so
+      --binlog-format=ROW
+      --default-storage-engine=InnoDB
+      --innodb-autoinc-lock-mode=2
+    environment:
+      - MARIADB_ROOT_PASSWORD=internpass
+    ports:
+      - "3306:3306"
+    networks:
+      - galera-net
+
+  galera-node2:
+    image: mariadb:11.4
+    container_name: galera-node2
+    command: >
+      --wsrep-on=ON
+      --wsrep-cluster-name=glynac_cluster
+      --wsrep-cluster-address=gcomm://galera-node1
+      --wsrep-node-name=galera-node2
+      --wsrep-node-address=galera-node2
+      --wsrep-provider=/usr/lib/galera/libgalera_smm.so
+      --binlog-format=ROW
+      --default-storage-engine=InnoDB
+      --innodb-autoinc-lock-mode=2
+    environment:
+      - MARIADB_ROOT_PASSWORD=internpass
+    ports:
+      - "3307:3306"
+    networks:
+      - galera-net
+    depends_on:
+      - galera-node1
+
+  galera-node3:
+    image: mariadb:11.4
+    container_name: galera-node3
+    command: >
+      --wsrep-on=ON
+      --wsrep-cluster-name=glynac_cluster
+      --wsrep-cluster-address=gcomm://galera-node1
+      --wsrep-node-name=galera-node3
+      --wsrep-node-address=galera-node3
+      --wsrep-provider=/usr/lib/galera/libgalera_smm.so
+      --binlog-format=ROW
+      --default-storage-engine=InnoDB
+      --innodb-autoinc-lock-mode=2
+    environment:
+      - MARIADB_ROOT_PASSWORD=internpass
+    ports:
+      - "3308:3306"
+    networks:
+      - galera-net
+    depends_on:
+      - galera-node1
+
+networks:
+  galera-net:
+    driver: bridge
